@@ -25,6 +25,7 @@ dependencies:
   qr_flutter: ^4.0.0
   rsa_encrypt: ^1.0.5
   dart_amqp: ^0.1.4
+  json_store: ^1.4.0
 
   flutter:
     sdk: flutter

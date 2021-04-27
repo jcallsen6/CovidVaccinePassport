@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:pointycastle/api.dart' as crypto;
 import 'package:pointycastle/asymmetric/api.dart';
 
 import "package:dart_amqp/dart_amqp.dart";
+
+import 'package:json_store/json_store.dart';
 
 void main() => runApp(MaterialApp(home: QRViewExample()));
 
@@ -23,14 +26,34 @@ class _QRViewExampleState extends State<QRViewExample> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   bool user = false;
   Client rabbitClient;
+  JsonStore jsonStore = JsonStore();
 
   // source for generating keypair: https://pub.dev/packages/rsa_encrypt
   //to store the KeyPair once we get data from our future
   crypto.AsymmetricKeyPair keyPair;
 
-  void _getKeyPair() async {
+  Future<void> _genKeyPair() async {
     var helper = RsaKeyHelper();
-    this.keyPair = await helper.computeRSAKeyPair(helper.getSecureRandom());
+    keyPair = await helper.computeRSAKeyPair(helper.getSecureRandom());
+  }
+
+  Future<void> _loadFromStorage() async {
+    Map<String, dynamic> json = await jsonStore.getItem('keypair');
+    var helper = RsaKeyHelper();
+    if (json == null) {
+      await _genKeyPair();
+      await jsonStore.setItem('keypair', {
+        'publickey':
+            helper.encodePublicKeyToPemPKCS1(keyPair.publicKey as RSAPublicKey),
+        'privatekey': helper
+            .encodePrivateKeyToPemPKCS1(keyPair.privateKey as RSAPrivateKey)
+      });
+    } else {
+      keyPair = crypto.AsymmetricKeyPair(
+          helper.parsePublicKeyFromPem(json['publickey']),
+          helper.parsePrivateKeyFromPem(json['privatekey']));
+    }
+    setState(() {});
   }
 
   void _connRabbitMQ() async {
@@ -68,7 +91,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   void initState() {
-    _getKeyPair();
+    _loadFromStorage();
     _connRabbitMQ();
     super.initState();
   }
@@ -87,12 +110,19 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(children: <Widget>[
-        Flexible(flex: 4, child: _qrCodeDisplay(context)),
-        Flexible(flex: 4, child: _buildQrView(context)),
-      ]),
-    );
+    if (keyPair == null) {
+      return Scaffold(
+          body: Column(
+        children: <Widget>[Text('Loading')],
+      ));
+    } else {
+      return Scaffold(
+        body: Column(children: <Widget>[
+          Flexible(flex: 4, child: _qrCodeDisplay(context)),
+          Flexible(flex: 4, child: _buildQrView(context)),
+        ]),
+      );
+    }
   }
 
   // source: https://pub.dev/packages/qr_code_scanner/example
@@ -119,7 +149,8 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   // source: https://pub.dev/packages/qr_code_scanner/example
   QrImage _qrCodeDisplay(BuildContext context) => QrImage(
-        data: "1234567890",
+        data: RsaKeyHelper()
+            .encodePublicKeyToPemPKCS1(keyPair.publicKey as RSAPublicKey),
         version: QrVersions.auto,
         size: MediaQuery.of(context).size.height / 2,
       );
@@ -129,14 +160,17 @@ class _QRViewExampleState extends State<QRViewExample> {
     setState(() {
       this.controller = controller;
     });
+    Random rng = new Random();
+    String message = '';
+    for (var i = 0; i < 25; i++) {
+      message += rng.nextInt(10000).toString();
+    }
+    String signature =
+        RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
+
     controller.scannedDataStream.listen((scanData) {
       setState(() {
-        result = scanData;
-        print(result);
-        print(RsaKeyHelper()
-            .encodePrivateKeyToPemPKCS1(keyPair.privateKey as RSAPrivateKey));
-        print(RsaKeyHelper()
-            .encodePublicKeyToPemPKCS1(keyPair.publicKey as RSAPublicKey));
+        _publish('Buisnesses', scanData.toString(), "$message:$signature");
       });
     });
   }
