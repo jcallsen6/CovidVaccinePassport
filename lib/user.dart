@@ -122,7 +122,9 @@ class _UserView extends State<UserView> {
               flex: 4,
               child: QRShowWidget(RsaKeyHelper().encodePublicKeyToPemPKCS1(
                   keyPair.publicKey as RSAPublicKey))),
-          Flexible(flex: 4, child: QRScanWidget(_onQRViewCreated)),
+          Flexible(
+              flex: 4,
+              child: QRScanWidget(_onQRViewCreated, CameraFacing.back)),
         ]),
       );
     }

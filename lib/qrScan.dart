@@ -6,8 +6,9 @@ class QRScanWidget extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _QRScanWidget();
   final Function onViewCreated;
+  final CameraFacing camFacing;
 
-  QRScanWidget(this.onViewCreated);
+  QRScanWidget(this.onViewCreated, this.camFacing);
 }
 
 class _QRScanWidget extends State<QRScanWidget> {
@@ -23,7 +24,7 @@ class _QRScanWidget extends State<QRScanWidget> {
     // To ensure the Scanner view is properly sizes after rotation
     // we need to listen for Flutter SizeChanged notification and update controller
     return QRView(
-      cameraFacing: CameraFacing.front,
+      cameraFacing: widget.camFacing,
       key: qrKey,
       onQRViewCreated: widget.onViewCreated,
       overlay: QrScannerOverlayShape(
