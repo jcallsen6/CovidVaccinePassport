@@ -65,19 +65,6 @@ class _BuisnessView extends State<BuisnessView> {
   }
 
 // source: https://pub.dev/packages/dart_amqp
-  void _publish(String exchange, String queue, String message) async {
-    rabbitClient
-        .channel()
-        .then((Channel channel) =>
-            channel.exchange(exchange, ExchangeType.DIRECT))
-        .then((Exchange exchange) {
-      // We dont care about the routing key as our exchange type is FANOUT
-      exchange.publish(message, queue);
-      rabbitClient.close();
-    });
-  }
-
-// source: https://pub.dev/packages/dart_amqp
   void _consume(String queue) {
     rabbitClient
         .channel()

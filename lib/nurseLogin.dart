@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:convert';
 
 import 'package:qr_example/nurse.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:qr_example/qrScan.dart';
 
 class NurseLoginView extends StatefulWidget {
   @override

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -22,9 +21,6 @@ class UserView extends StatefulWidget {
 }
 
 class _UserView extends State<UserView> {
-  Barcode result;
-  QRViewController controller;
-  bool user = false;
   Client rabbitClient;
   JsonStore jsonStore = JsonStore();
 
@@ -78,34 +74,11 @@ class _UserView extends State<UserView> {
     });
   }
 
-// source: https://pub.dev/packages/dart_amqp
-  void _consume(String queue) {
-    rabbitClient
-        .channel()
-        .then((Channel channel) => channel.queue(queue))
-        .then((Queue queue) => queue.consume())
-        .then((Consumer consumer) => consumer.listen((AmqpMessage message) {
-              print(" [x] Received string: ${message.payloadAsString}");
-            }));
-  }
-
   @override
   void initState() {
     _loadFromStorage();
     _connRabbitMQ();
     super.initState();
-  }
-
-// source: https://pub.dev/packages/qr_code_scanner/example
-// In order to get hot reload to work we need to pause the camera if the platform
-// is android, or resume the camera if the platform is iOS.
-  @override
-  void reassemble() {
-    super.reassemble();
-    if (Platform.isAndroid) {
-      controller.pauseCamera();
-    }
-    controller.resumeCamera();
   }
 
   @override
@@ -122,19 +95,13 @@ class _UserView extends State<UserView> {
               flex: 4,
               child: QRShowWidget(RsaKeyHelper().encodePublicKeyToPemPKCS1(
                   keyPair.publicKey as RSAPublicKey))),
-          Flexible(
-              flex: 4,
-              child: QRScanWidget(_onQRViewCreated, CameraFacing.back)),
+          Flexible(flex: 4, child: QRScanWidget(_onScan)),
         ]),
       );
     }
   }
 
-// source: https://pub.dev/packages/qr_code_scanner/example
-  void _onQRViewCreated(QRViewController controller) {
-    setState(() {
-      this.controller = controller;
-    });
+  void _onScan(Barcode result) {
     Random rng = new Random();
     String message = '';
     for (var i = 0; i < 25; i++) {
@@ -143,13 +110,7 @@ class _UserView extends State<UserView> {
     String signature =
         RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
 
-    controller.scannedDataStream.listen((scanData) {
-      // TODO visual indication qr code was scanned
-      // TODO timer to not repeat a million times a second
-      setState(() {
-        _publish('Buisnesses', scanData.toString(), "$message:$signature");
-      });
-    });
+    _publish('Buisnesses', result.toString(), "$message:$signature");
   }
 
 // source: https://github.com/PointyCastle/pointycastle/blob/master/tutorials/rsa.md
@@ -168,12 +129,5 @@ class _UserView extends State<UserView> {
             RsaKeyHelper().parsePublicKeyFromPem(publicKey)));
 
     return (verifier.verifySignature(rawMessage, rsaSig));
-  }
-
-// source: https://pub.dev/packages/qr_code_scanner/example
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 }
