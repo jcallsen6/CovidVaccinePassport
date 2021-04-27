@@ -23,34 +23,20 @@ class _BuisnessView extends State<BuisnessView> {
   Barcode result;
   QRViewController controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  bool user = false;
   Client rabbitClient;
   JsonStore jsonStore = JsonStore();
-
-// source for generating keypair: https://pub.dev/packages/rsa_encrypt
-//to store the KeyPair once we get data from our future
-  crypto.AsymmetricKeyPair keyPair;
-
-  Future<void> _genKeyPair() async {
-    var helper = RsaKeyHelper();
-    keyPair = await helper.computeRSAKeyPair(helper.getSecureRandom());
-  }
+  String id = '';
 
   Future<void> _loadFromStorage() async {
-    Map<String, dynamic> json = await jsonStore.getItem('keypair');
-    var helper = RsaKeyHelper();
+    Map<String, dynamic> json = await jsonStore.getItem('buisness');
     if (json == null) {
-      await _genKeyPair();
-      await jsonStore.setItem('keypair', {
-        'publickey':
-            helper.encodePublicKeyToPemPKCS1(keyPair.publicKey as RSAPublicKey),
-        'privatekey': helper
-            .encodePrivateKeyToPemPKCS1(keyPair.privateKey as RSAPrivateKey)
-      });
+      Random rng = new Random();
+      for (var i = 0; i < 25; i++) {
+        id += rng.nextInt(10000).toString();
+      }
+      await jsonStore.setItem('buisness', {'id': id});
     } else {
-      keyPair = crypto.AsymmetricKeyPair(
-          helper.parsePublicKeyFromPem(json['publickey']),
-          helper.parsePrivateKeyFromPem(json['privatekey']));
+      id = json['id'];
     }
     setState(() {});
   }
@@ -96,7 +82,7 @@ class _BuisnessView extends State<BuisnessView> {
 
   @override
   Widget build(BuildContext context) {
-    if (keyPair == null) {
+    if (id == null) {
       return Scaffold(
           body: Column(
         children: <Widget>[Text('Loading')],
@@ -135,8 +121,7 @@ class _BuisnessView extends State<BuisnessView> {
 
 // source: https://pub.dev/packages/qr_code_scanner/example
   QrImage _qrCodeDisplay(BuildContext context) => QrImage(
-        data: RsaKeyHelper()
-            .encodePublicKeyToPemPKCS1(keyPair.publicKey as RSAPublicKey),
+        data: id,
         version: QrVersions.auto,
         size: MediaQuery.of(context).size.height / 2,
       );
@@ -146,14 +131,6 @@ class _BuisnessView extends State<BuisnessView> {
     setState(() {
       this.controller = controller;
     });
-    Random rng = new Random();
-    String message = '';
-    for (var i = 0; i < 25; i++) {
-      message += rng.nextInt(10000).toString();
-    }
-    String signature =
-        RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
-
     controller.scannedDataStream.listen((scanData) {
       // TODO visual indication qr code was scanned
       // TODO make GET request to API to verify pubkey
