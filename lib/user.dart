@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -14,6 +13,9 @@ import "package:dart_amqp/dart_amqp.dart";
 
 import 'package:json_store/json_store.dart';
 
+import 'package:qr_example/qrScan.dart';
+import 'package:qr_example/qrShow.dart';
+
 class UserView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _UserView();
@@ -22,7 +24,6 @@ class UserView extends StatefulWidget {
 class _UserView extends State<UserView> {
   Barcode result;
   QRViewController controller;
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   bool user = false;
   Client rabbitClient;
   JsonStore jsonStore = JsonStore();
@@ -117,42 +118,15 @@ class _UserView extends State<UserView> {
     } else {
       return Scaffold(
         body: Column(children: <Widget>[
-          Flexible(flex: 4, child: _qrCodeDisplay(context)),
-          Flexible(flex: 4, child: _buildQrView(context)),
+          Flexible(
+              flex: 4,
+              child: QRShowWidget(RsaKeyHelper().encodePublicKeyToPemPKCS1(
+                  keyPair.publicKey as RSAPublicKey))),
+          Flexible(flex: 4, child: QRScanWidget(_onQRViewCreated)),
         ]),
       );
     }
   }
-
-// source: https://pub.dev/packages/qr_code_scanner/example
-  Widget _buildQrView(BuildContext context) {
-    // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
-    var scanArea = (MediaQuery.of(context).size.width < 400 ||
-            MediaQuery.of(context).size.height < 400)
-        ? 250.0
-        : 200.0;
-    // To ensure the Scanner view is properly sizes after rotation
-    // we need to listen for Flutter SizeChanged notification and update controller
-    return QRView(
-      cameraFacing: CameraFacing.front,
-      key: qrKey,
-      onQRViewCreated: _onQRViewCreated,
-      overlay: QrScannerOverlayShape(
-          borderColor: Colors.red,
-          borderRadius: 10,
-          borderLength: 30,
-          borderWidth: 10,
-          cutOutSize: scanArea),
-    );
-  }
-
-// source: https://pub.dev/packages/qr_code_scanner/example
-  QrImage _qrCodeDisplay(BuildContext context) => QrImage(
-        data: RsaKeyHelper()
-            .encodePublicKeyToPemPKCS1(keyPair.publicKey as RSAPublicKey),
-        version: QrVersions.auto,
-        size: MediaQuery.of(context).size.height / 2,
-      );
 
 // source: https://pub.dev/packages/qr_code_scanner/example
   void _onQRViewCreated(QRViewController controller) {
@@ -169,6 +143,7 @@ class _UserView extends State<UserView> {
 
     controller.scannedDataStream.listen((scanData) {
       // TODO visual indication qr code was scanned
+      // TODO timer to not repeat a million times a second
       setState(() {
         _publish('Buisnesses', scanData.toString(), "$message:$signature");
       });

@@ -26,6 +26,7 @@ dependencies:
   rsa_encrypt: ^1.0.5
   dart_amqp: ^0.1.4
   json_store: ^1.4.0
+  http: ^0.13.1
 
   flutter:
     sdk: flutter

@@ -170,6 +170,7 @@ class _BuisnessView extends State<BuisnessView> {
     controller.scannedDataStream.listen((scanData) {
       // TODO visual indication qr code was scanned
       // TODO make GET request to API to verify pubkey
+      // TODO timer to not repeat a million times a second
     });
   }
 

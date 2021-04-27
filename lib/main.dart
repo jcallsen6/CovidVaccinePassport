@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_example/nurse.dart';
+import 'package:qr_example/nurseLogin.dart';
 import 'package:qr_example/user.dart';
 import 'package:qr_example/buisness.dart';
 
@@ -10,6 +10,7 @@ class LoginView extends StatefulWidget {
   State<StatefulWidget> createState() => _LoginView();
 }
 
+// TODO remember this choice and just load by default after first opening
 class _LoginView extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +47,7 @@ class _LoginView extends State<LoginView> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NurseView()),
+                  MaterialPageRoute(builder: (context) => NurseLoginView()),
                 );
               },
               child: Text(
