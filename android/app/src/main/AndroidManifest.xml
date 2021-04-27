@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.qr_example">
    <application
-        android:label="qr_example"
+        android:label="VPassport"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
