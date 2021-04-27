@@ -16,6 +16,7 @@ class _QRScanWidget extends State<QRScanWidget> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QRScan');
   Barcode result;
   QRViewController controller;
+  bool _scanning = false;
 
   Widget build(BuildContext context) {
     // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
@@ -53,10 +54,16 @@ class _QRScanWidget extends State<QRScanWidget> {
     setState(() {
       this.controller = controller;
     });
-    controller.scannedDataStream.listen((scanData) {
-      setState(() {
-        widget.onScan(scanData);
-      });
+    controller.scannedDataStream.listen((scanData) async {
+      if (!_scanning) {
+        _scanning = true;
+        controller.pauseCamera();
+        await widget.onScan(scanData);
+        setState(() {
+          controller.resumeCamera();
+        });
+        _scanning = false;
+      }
     });
   }
 

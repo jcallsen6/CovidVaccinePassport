@@ -5,7 +5,6 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:pointycastle/api.dart' as crypto;
-import 'package:pointycastle/export.dart' as cryptoExport;
 import 'package:pointycastle/asymmetric/api.dart';
 
 import "package:dart_amqp/dart_amqp.dart";
@@ -111,23 +110,5 @@ class _UserView extends State<UserView> {
         RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
 
     _publish('Buisnesses', result.toString(), "$message:$signature");
-  }
-
-// source: https://github.com/PointyCastle/pointycastle/blob/master/tutorials/rsa.md
-  bool _verifySignature(String message, String publicKey) {
-    final contents = message.split(':');
-    final rawMessage = contents[0].codeUnits;
-    final signature = contents[1].codeUnits;
-    final rsaSig = RSASignature(signature);
-
-    final verifier = cryptoExport.RSASigner(
-        cryptoExport.SHA256Digest(), "0609608648016503040201");
-
-    verifier.init(
-        false,
-        crypto.PublicKeyParameter<RSAPublicKey>(
-            RsaKeyHelper().parsePublicKeyFromPem(publicKey)));
-
-    return (verifier.verifySignature(rawMessage, rsaSig));
   }
 }

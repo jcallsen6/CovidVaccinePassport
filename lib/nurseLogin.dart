@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:convert';
 
 import 'package:qr_example/nurse.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:qr_example/qrScan.dart';
 
 class NurseLoginView extends StatefulWidget {
   @override
@@ -40,7 +38,7 @@ class _NurseLoginView extends State<NurseLoginView> {
         ),
         TextFormField(
           decoration: const InputDecoration(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.lock),
             hintText: 'Password',
             labelText: 'Password',
           ),
@@ -90,11 +88,6 @@ class _NurseLoginView extends State<NurseLoginView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Invalid Nurse Login'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[],
-            ),
-          ),
           actions: <Widget>[
             TextButton(
               child: Text('Retry'),
