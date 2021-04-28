@@ -113,7 +113,7 @@ class _UserView extends State<UserView> {
     );
   }
 
-  void _onScan(Barcode result) async {
+  Future<void> _onScan(Barcode result) async {
     Random rng = new Random();
     String message = '';
     for (var i = 0; i < 5; i++) {
