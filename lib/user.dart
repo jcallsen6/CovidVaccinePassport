@@ -57,14 +57,14 @@ class _UserView extends State<UserView> {
   }
 
 // source: https://pub.dev/packages/dart_amqp
-  void _publish(String exchange, String queue, String message) async {
+  Future<void> _publish(String exchange, String queue, String message) async {
     rabbitClient
         .channel()
         .then((Channel channel) =>
             channel.exchange(exchange, ExchangeType.DIRECT))
         .then((Exchange exchange) {
       exchange.publish(message, queue);
-      rabbitClient.close();
+      return rabbitClient.close();
     });
   }
 
@@ -113,15 +113,37 @@ class _UserView extends State<UserView> {
     );
   }
 
-  void _onScan(Barcode result) {
+  void _onScan(Barcode result) async {
     Random rng = new Random();
     String message = '';
-    for (var i = 0; i < 25; i++) {
+    for (var i = 0; i < 5; i++) {
       message += rng.nextInt(10).toString();
     }
     String signature =
         RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
 
-    _publish('Businesses', result.code, "$message:$signature");
+    await _publish('Businesses', result.code, "$message:$signature");
+    await _showPublishDialog(message);
+  }
+
+  // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
+  Future<void> _showPublishDialog(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Continue'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
