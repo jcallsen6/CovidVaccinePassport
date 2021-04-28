@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'package:pointycastle/asymmetric/api.dart';
 import "package:dart_amqp/dart_amqp.dart";
 import 'package:qr_example/qrShow.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:json_store/json_store.dart';
 
 class BusinessAuthView extends StatefulWidget {
@@ -60,7 +60,7 @@ class _BusinessAuthView extends State<BusinessAuthView> {
   bool _verifySignature(String message, String publicKey) {
     final contents = message.split(':');
     final rawMessage = Uint8List.fromList(contents[0].codeUnits);
-    final signature = Uint8List.fromList(contents[1].codeUnits);
+    final signature = base64Decode(contents[1]);
     final rsaSig = RSASignature(signature);
 
     final verifier = cryptoExport.RSASigner(

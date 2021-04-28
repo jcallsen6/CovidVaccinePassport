@@ -65,7 +65,7 @@ class _LoginView extends State<LoginView> {
                 );
               },
               child: Text(
-                'business',
+                'Business',
                 style: TextStyle(fontSize: 50),
               )),
         ),
