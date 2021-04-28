@@ -19,9 +19,24 @@ class _BusinessScanView extends State<BusinessScanView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: _buildAppBar(context),
       body: Column(children: <Widget>[
         Flexible(flex: 4, child: QRScanWidget(_onScan)),
       ]),
+    );
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text('Business'),
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.home),
+        tooltip: 'Change user type',
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 

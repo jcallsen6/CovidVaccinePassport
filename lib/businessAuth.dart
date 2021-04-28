@@ -79,8 +79,6 @@ class _BusinessAuthView extends State<BusinessAuthView> {
   }
 
   void _connRabbitMQ() async {
-    // You can provide a settings object to override the
-    // default connection settings
     ConnectionSettings settings = new ConnectionSettings(
         host: "192.168.1.155",
         authProvider: new PlainAuthenticator("control", "ZafbCB4SxSAL2p"));
@@ -107,7 +105,7 @@ class _BusinessAuthView extends State<BusinessAuthView> {
   Future<void> _showSuccessDialog(String message) async {
     return showDialog<void>(
       context: context,
-      barrierDismissible: false, // user must tap button!
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Valid User!'),

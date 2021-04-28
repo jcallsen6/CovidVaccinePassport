@@ -16,68 +16,82 @@ class _NurseLoginView extends State<NurseLoginView> {
 
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: _buildAppBar(context),
         body: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          alignment: Alignment.center,
-          child: Text(
-            'Nurse Authentication',
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 32, color: Colors.blue),
-            textAlign: TextAlign.center,
-          ),
-        ),
-        TextFormField(
-          decoration: const InputDecoration(
-            icon: Icon(Icons.person),
-            hintText: 'Username',
-            labelText: 'Username',
-          ),
-          controller: _username,
-        ),
-        TextFormField(
-          decoration: const InputDecoration(
-            icon: Icon(Icons.lock),
-            hintText: 'Password',
-            labelText: 'Password',
-          ),
-          controller: _password,
-          obscureText: true,
-        ),
-        Container(
-          alignment: Alignment.center,
-          child: ElevatedButton(
-              onPressed: () async {
-                // source for basic auth: https://stackoverflow.com/questions/50244416/how-to-pass-basic-auth-credentials-in-api-call-for-a-flutter-mobile-application
-                String basicAuth = 'Basic ' +
-                    base64Encode(
-                        utf8.encode('${_username.text}:${_password.text}'));
-                var client = http.Client();
-                var req = await client.get(
-                  Uri.parse('http://192.168.1.155:8080/Authenticate'),
-                  headers: <String, String>{'authorization': basicAuth},
-                );
-                if (req.statusCode == 200) {
-                  client.close();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            NurseScanView(_username.text, _password.text)),
-                  );
-                } else {
-                  client.close();
-                  _invalidLogin();
-                }
-              },
-              child: Text(
-                'Login',
-                style: TextStyle(fontSize: 25),
-              )),
-        ),
-      ],
-    ));
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              alignment: Alignment.center,
+              child: Icon(Icons.admin_panel_settings_outlined, size: 256),
+            ),
+            Padding(
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.person),
+                    hintText: 'Username',
+                    labelText: 'Username',
+                  ),
+                  controller: _username,
+                ),
+                padding: EdgeInsets.fromLTRB(20, 5, 30, 5)),
+            Padding(
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.lock),
+                    hintText: 'Password',
+                    labelText: 'Password',
+                  ),
+                  controller: _password,
+                  obscureText: true,
+                ),
+                padding: EdgeInsets.fromLTRB(20, 10, 30, 10)),
+            Container(
+              alignment: Alignment.center,
+              child: ElevatedButton(
+                  onPressed: () async {
+                    // source for basic auth: https://stackoverflow.com/questions/50244416/how-to-pass-basic-auth-credentials-in-api-call-for-a-flutter-mobile-application
+                    String basicAuth = 'Basic ' +
+                        base64Encode(
+                            utf8.encode('${_username.text}:${_password.text}'));
+                    var client = http.Client();
+                    var req = await client.get(
+                      Uri.parse('http://192.168.1.155:8080/Authenticate'),
+                      headers: <String, String>{'authorization': basicAuth},
+                    );
+                    if (req.statusCode == 200) {
+                      client.close();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                NurseScanView(_username.text, _password.text)),
+                      );
+                    } else {
+                      client.close();
+                      _invalidLogin();
+                    }
+                  },
+                  child: Text(
+                    'Login',
+                    style: TextStyle(fontSize: 25),
+                  )),
+            ),
+          ],
+        ));
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text('Nurse Authentication'),
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.home),
+        tooltip: 'Change user type',
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html

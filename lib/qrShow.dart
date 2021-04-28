@@ -15,6 +15,5 @@ class _QRShowWidget extends State<QRShowWidget> {
   QrImage build(BuildContext context) => QrImage(
         data: widget.contents,
         version: QrVersions.auto,
-        size: MediaQuery.of(context).size.height / 2,
       );
 }

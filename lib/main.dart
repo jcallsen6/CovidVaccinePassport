@@ -1,36 +1,73 @@
 import 'package:flutter/material.dart';
+
+import 'package:json_store/json_store.dart';
+
 import 'package:qr_example/nurseLogin.dart';
 import 'package:qr_example/user.dart';
 import 'package:qr_example/businessScan.dart';
 
-void main() => runApp(MaterialApp(home: LoginView()));
+void main() => runApp(MaterialApp(home: MenuView()));
 
-class LoginView extends StatefulWidget {
+class MenuView extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _LoginView();
+  State<StatefulWidget> createState() => _MenuView();
 }
 
-// TODO remember this choice and just load by default after first opening
-class _LoginView extends State<LoginView> {
+class _MenuView extends State<MenuView> {
+  JsonStore jsonStore = JsonStore();
+
+  @override
+  void initState() {
+    _loadUserType();
+    super.initState();
+  }
+
+  void _loadUserType() async {
+    Map<String, dynamic> json = await jsonStore.getItem('userType');
+    if (json != null) {
+      switch (json['type']) {
+        case 'user':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => UserView()),
+          );
+          break;
+        case 'nurse':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NurseLoginView()),
+          );
+          break;
+        case 'business':
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => BusinessScanView()),
+          );
+          break;
+      }
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        Container(
-          alignment: Alignment.center,
-          child: Text(
+        Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          Text(
             'COVID-19 Vaccine Passport',
             style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 64, color: Colors.blue),
+                fontWeight: FontWeight.bold, fontSize: 50, color: Colors.blue),
             textAlign: TextAlign.center,
           ),
-        ),
+        ]),
+        Icon(Icons.medical_services_outlined, size: 256),
         Container(
           alignment: Alignment.center,
           child: ElevatedButton(
               onPressed: () {
+                jsonStore.setItem('userType', {'type': 'user'});
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => UserView()),
@@ -45,6 +82,7 @@ class _LoginView extends State<LoginView> {
           alignment: Alignment.center,
           child: ElevatedButton(
               onPressed: () {
+                jsonStore.setItem('userType', {'type': 'nurse'});
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => NurseLoginView()),
@@ -59,6 +97,7 @@ class _LoginView extends State<LoginView> {
           alignment: Alignment.center,
           child: ElevatedButton(
               onPressed: () {
+                jsonStore.setItem('userType', {'type': 'business'});
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => BusinessScanView()),
@@ -73,5 +112,3 @@ class _LoginView extends State<LoginView> {
     ));
   }
 }
-
-enum userType { Nurse, business, User }

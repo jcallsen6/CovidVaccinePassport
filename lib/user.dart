@@ -50,8 +50,6 @@ class _UserView extends State<UserView> {
   }
 
   void _connRabbitMQ() async {
-    // You can provide a settings object to override the
-    // default connection settings
     ConnectionSettings settings = new ConnectionSettings(
         host: "192.168.1.155",
         authProvider: new PlainAuthenticator("control", "ZafbCB4SxSAL2p"));
@@ -87,15 +85,32 @@ class _UserView extends State<UserView> {
       ));
     } else {
       return Scaffold(
-        body: Column(children: <Widget>[
-          Flexible(
-              flex: 4,
-              child: QRShowWidget(RsaKeyHelper().encodePublicKeyToPemPKCS1(
-                  keyPair.publicKey as RSAPublicKey))),
-          Flexible(flex: 4, child: QRScanWidget(_onScan)),
-        ]),
+        appBar: _buildAppBar(context),
+        body: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Flexible(
+                  flex: 4,
+                  child: QRShowWidget(RsaKeyHelper().encodePublicKeyToPemPKCS1(
+                      keyPair.publicKey as RSAPublicKey))),
+              Flexible(flex: 4, child: QRScanWidget(_onScan)),
+            ]),
       );
     }
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text('User'),
+      centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.home),
+        tooltip: 'Change user type',
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   void _onScan(Barcode result) {
