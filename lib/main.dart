@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qr_example/nurseLogin.dart';
 import 'package:qr_example/user.dart';
-import 'package:qr_example/buisness.dart';
+import 'package:qr_example/businessScan.dart';
 
 void main() => runApp(MaterialApp(home: LoginView()));
 
@@ -61,11 +61,11 @@ class _LoginView extends State<LoginView> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => BuisnessView()),
+                  MaterialPageRoute(builder: (context) => BusinessScanView()),
                 );
               },
               child: Text(
-                'Buisness',
+                'business',
                 style: TextStyle(fontSize: 50),
               )),
         ),
@@ -74,4 +74,4 @@ class _LoginView extends State<LoginView> {
   }
 }
 
-enum userType { Nurse, Buisness, User }
+enum userType { Nurse, business, User }

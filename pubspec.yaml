@@ -27,7 +27,8 @@ dependencies:
   dart_amqp: ^0.1.4
   json_store: ^1.4.0
   http: ^0.13.1
-
+  flutter_spinkit: "^4.1.2"
+  
   flutter:
     sdk: flutter
 

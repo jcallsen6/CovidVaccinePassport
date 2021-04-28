@@ -1,15 +1,13 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:pointycastle/api.dart' as crypto;
 import 'package:pointycastle/asymmetric/api.dart';
-
 import "package:dart_amqp/dart_amqp.dart";
-
 import 'package:json_store/json_store.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:qr_example/qrScan.dart';
 import 'package:qr_example/qrShow.dart';
@@ -85,7 +83,8 @@ class _UserView extends State<UserView> {
     if (keyPair == null) {
       return Scaffold(
           body: Column(
-        children: <Widget>[Text('Loading')],
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[SpinKitRing(color: Colors.blue)],
       ));
     } else {
       return Scaffold(
@@ -109,6 +108,6 @@ class _UserView extends State<UserView> {
     String signature =
         RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
 
-    _publish('Buisnesses', result.toString(), "$message:$signature");
+    _publish('businesses', result.toString(), "$message:$signature");
   }
 }

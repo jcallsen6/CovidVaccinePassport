@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:qr_example/qrScan.dart';
 
@@ -33,7 +34,8 @@ class _NurseView extends State<NurseView> {
     } else {
       return Scaffold(
           body: Column(
-        children: <Widget>[Text('Loading')],
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[SpinKitRing(color: Colors.blue)],
       ));
     }
   }
