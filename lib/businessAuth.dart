@@ -86,17 +86,19 @@ class _BusinessAuthView extends State<BusinessAuthView> {
   }
 
   // source: https://pub.dev/packages/dart_amqp
-  void _consume(String queue) {
+  Future<void> _consume(String queue) async {
     rabbitClient
         .channel()
         .then((Channel channel) =>
             channel.exchange('Businesses', ExchangeType.DIRECT))
         .then((Exchange exchange) => exchange.bindQueueConsumer(queue, [queue]))
-        .then((Consumer consumer) => consumer.listen((AmqpMessage message) {
+        .then((Consumer consumer) =>
+            consumer.listen((AmqpMessage message) async {
               String result =
                   _verifySignature(message.payloadAsString, widget.publicKey);
               if (result != null) {
-                _showSuccessDialog(result);
+                await _showSuccessDialog(result);
+                Navigator.pop(context);
               }
             }));
   }
