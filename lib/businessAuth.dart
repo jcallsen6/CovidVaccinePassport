@@ -34,9 +34,13 @@ class _BusinessAuthView extends State<BusinessAuthView> {
   Future<void> _loadFromStorage() async {
     Map<String, dynamic> json = await jsonStore.getItem('business');
     if (json == null) {
+      // source for random string: https://stackoverflow.com/a/61929967
+      const String _charSpace =
+          'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvqxyz0123456789';
       Random rng = new Random();
-      for (var i = 0; i < 10; i++) {
-        id += rng.nextInt(10).toString();
+      for (var index = 0; index < 64; index++) {
+        int charIndex = rng.nextInt(_charSpace.length);
+        id += _charSpace.substring(charIndex, charIndex + 1);
       }
       await jsonStore.setItem('business', {'id': id});
     } else {
