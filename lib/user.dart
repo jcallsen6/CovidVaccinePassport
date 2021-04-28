@@ -65,7 +65,6 @@ class _UserView extends State<UserView> {
         .then((Channel channel) =>
             channel.exchange(exchange, ExchangeType.DIRECT))
         .then((Exchange exchange) {
-      // We dont care about the routing key as our exchange type is FANOUT
       exchange.publish(message, queue);
       rabbitClient.close();
     });
@@ -103,11 +102,11 @@ class _UserView extends State<UserView> {
     Random rng = new Random();
     String message = '';
     for (var i = 0; i < 25; i++) {
-      message += rng.nextInt(10000).toString();
+      message += rng.nextInt(10).toString();
     }
     String signature =
         RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
 
-    _publish('businesses', result.toString(), "$message:$signature");
+    _publish('Businesses', result.code, "$message:$signature");
   }
 }
