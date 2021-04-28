@@ -58,11 +58,14 @@ class _MenuView extends State<MenuView> {
           Text(
             'COVID-19 Vaccine Passport',
             style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 50, color: Colors.blue),
+                fontWeight: FontWeight.bold,
+                fontSize: MediaQuery.of(context).size.height / 20,
+                color: Colors.blue),
             textAlign: TextAlign.center,
           ),
         ]),
-        Icon(Icons.medical_services_outlined, size: 256),
+        Icon(Icons.medical_services_outlined,
+            size: MediaQuery.of(context).size.height / 3),
         Container(
           alignment: Alignment.center,
           child: ElevatedButton(

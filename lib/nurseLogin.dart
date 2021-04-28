@@ -16,13 +16,15 @@ class _NurseLoginView extends State<NurseLoginView> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _buildAppBar(context),
-        body: Column(
+      appBar: _buildAppBar(context),
+      body: SingleChildScrollView(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Container(
               alignment: Alignment.center,
-              child: Icon(Icons.admin_panel_settings_outlined, size: 256),
+              child: Icon(Icons.admin_panel_settings_outlined,
+                  size: MediaQuery.of(context).size.height / 3),
             ),
             Padding(
                 child: TextFormField(
@@ -44,7 +46,7 @@ class _NurseLoginView extends State<NurseLoginView> {
                   controller: _password,
                   obscureText: true,
                 ),
-                padding: EdgeInsets.fromLTRB(20, 10, 30, 10)),
+                padding: EdgeInsets.fromLTRB(20, 0, 30, 10)),
             Container(
               alignment: Alignment.center,
               child: ElevatedButton(
@@ -77,7 +79,9 @@ class _NurseLoginView extends State<NurseLoginView> {
                   )),
             ),
           ],
-        ));
+        ),
+      ),
+    );
   }
 
   AppBar _buildAppBar(BuildContext context) {
