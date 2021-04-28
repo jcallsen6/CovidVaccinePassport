@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
-import 'package:qr_example/nurse.dart';
+import 'package:qr_example/nurseScan.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -64,7 +64,7 @@ class _NurseLoginView extends State<NurseLoginView> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            NurseView(_username.text, _password.text)),
+                            NurseScanView(_username.text, _password.text)),
                   );
                 } else {
                   client.close();

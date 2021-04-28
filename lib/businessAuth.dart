@@ -57,7 +57,7 @@ class _BusinessAuthView extends State<BusinessAuthView> {
   }
 
   // source: https://github.com/PointyCastle/pointycastle/blob/master/tutorials/rsa.md
-  bool _verifySignature(String message, String publicKey) {
+  String _verifySignature(String message, String publicKey) {
     final contents = message.split(':');
     final rawMessage = Uint8List.fromList(contents[0].codeUnits);
     final signature = base64Decode(contents[1]);
@@ -71,7 +71,11 @@ class _BusinessAuthView extends State<BusinessAuthView> {
         crypto.PublicKeyParameter<RSAPublicKey>(
             RsaKeyHelper().parsePublicKeyFromPem(publicKey)));
 
-    return (verifier.verifySignature(rawMessage, rsaSig));
+    String result;
+    if (verifier.verifySignature(rawMessage, rsaSig)) {
+      result = contents[0];
+    }
+    return result;
   }
 
   void _connRabbitMQ() async {
@@ -91,11 +95,43 @@ class _BusinessAuthView extends State<BusinessAuthView> {
             channel.exchange('Businesses', ExchangeType.DIRECT))
         .then((Exchange exchange) => exchange.bindQueueConsumer(queue, [queue]))
         .then((Consumer consumer) => consumer.listen((AmqpMessage message) {
-              print(" [x] Received string: ${message.payloadAsString}");
-              bool result =
+              String result =
                   _verifySignature(message.payloadAsString, widget.publicKey);
-              // TODO display to user
-              print(result);
+              if (result != null) {
+                _showSuccessDialog(result);
+              }
             }));
+  }
+
+  // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
+  Future<void> _showSuccessDialog(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Valid User!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Icon(
+                  Icons.check,
+                  size: 64,
+                ),
+                Text(message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Continue'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

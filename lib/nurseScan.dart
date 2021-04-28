@@ -7,16 +7,16 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:qr_example/qrScan.dart';
 
-class NurseView extends StatefulWidget {
+class NurseScanView extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _NurseView();
+  State<StatefulWidget> createState() => _NurseScanView();
   final String username;
   final String password;
 
-  NurseView(this.username, this.password);
+  NurseScanView(this.username, this.password);
 }
 
-class _NurseView extends State<NurseView> {
+class _NurseScanView extends State<NurseScanView> {
   bool loaded = false;
 
   // Super dumb solution due to broken qr code scanner library. Camera crashes if
