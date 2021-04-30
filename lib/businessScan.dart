@@ -52,11 +52,4 @@ class _BusinessScanView extends State<BusinessScanView> {
       );
     }
   }
-
-// source: https://pub.dev/packages/qr_code_scanner/example
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
 }
