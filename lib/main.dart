@@ -50,68 +50,74 @@ class _MenuView extends State<MenuView> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          Text(
-            'COVID-19 Vaccine Passport',
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: MediaQuery.of(context).size.height / 20,
-                color: Colors.blue),
-            textAlign: TextAlign.center,
+        body: SingleChildScrollView(
+            child: Container(
+      height: MediaQuery.of(context).size.height,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'COVID-19 Vaccine Passport',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: MediaQuery.of(context).size.height / 20,
+                      color: Colors.blue),
+                  textAlign: TextAlign.center,
+                ),
+              ]),
+          Icon(Icons.medical_services_outlined,
+              size: MediaQuery.of(context).size.height / 3.25),
+          Container(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+                onPressed: () {
+                  jsonStore.setItem('userType', {'type': 'user'});
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserView()),
+                  );
+                },
+                child: Text(
+                  'User',
+                  style: TextStyle(fontSize: 50),
+                )),
           ),
-        ]),
-        Icon(Icons.medical_services_outlined,
-            size: MediaQuery.of(context).size.height / 3.25),
-        Container(
-          alignment: Alignment.center,
-          child: ElevatedButton(
-              onPressed: () {
-                jsonStore.setItem('userType', {'type': 'user'});
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => UserView()),
-                );
-              },
-              child: Text(
-                'User',
-                style: TextStyle(fontSize: 50),
-              )),
-        ),
-        Container(
-          alignment: Alignment.center,
-          child: ElevatedButton(
-              onPressed: () {
-                jsonStore.setItem('userType', {'type': 'nurse'});
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NurseLoginView()),
-                );
-              },
-              child: Text(
-                'Nurse',
-                style: TextStyle(fontSize: 50),
-              )),
-        ),
-        Container(
-          alignment: Alignment.center,
-          child: ElevatedButton(
-              onPressed: () {
-                jsonStore.setItem('userType', {'type': 'business'});
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => BusinessScanView()),
-                );
-              },
-              child: Text(
-                'Business',
-                style: TextStyle(fontSize: 50),
-              )),
-        ),
-      ],
-    ));
+          Container(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+                onPressed: () {
+                  jsonStore.setItem('userType', {'type': 'nurse'});
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => NurseLoginView()),
+                  );
+                },
+                child: Text(
+                  'Nurse',
+                  style: TextStyle(fontSize: 50),
+                )),
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: ElevatedButton(
+                onPressed: () {
+                  jsonStore.setItem('userType', {'type': 'business'});
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => BusinessScanView()),
+                  );
+                },
+                child: Text(
+                  'Business',
+                  style: TextStyle(fontSize: 50),
+                )),
+          ),
+        ],
+      ),
+    )));
   }
 }
