@@ -58,7 +58,9 @@ class _BusinessAuthView extends State<BusinessAuthView> {
         appBar: _buildAppBar(context),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[QRShowWidget(id)],
+          children: <Widget>[
+            QRShowWidget(id),
+          ],
         ));
   }
 
@@ -100,20 +102,19 @@ class _BusinessAuthView extends State<BusinessAuthView> {
 
   // source: https://pub.dev/packages/dart_amqp
   Future<void> _consume(String queue) async {
-    rabbitClient
-        .channel()
-        .then((Channel channel) =>
-            channel.exchange('Businesses', ExchangeType.DIRECT))
-        .then((Exchange exchange) => exchange.bindQueueConsumer(queue, [queue]))
-        .then((Consumer consumer) =>
-            consumer.listen((AmqpMessage message) async {
-              String result =
-                  _verifySignature(message.payloadAsString, widget.publicKey);
-              if (result != null) {
-                await _showSuccessDialog(result);
-                Navigator.pop(context);
-              }
-            }));
+    Channel channel = await rabbitClient.channel();
+    Exchange exchange = await channel.exchange('Business', ExchangeType.DIRECT);
+
+    Consumer consumer = await exchange.bindQueueConsumer(queue, [queue]);
+    consumer.listen((AmqpMessage message) async {
+      String result =
+          _verifySignature(message.payloadAsString, widget.publicKey);
+      if (result != null) {
+        await _showSuccessDialog(result);
+        rabbitClient.close();
+        Navigator.pop(context);
+      }
+    });
   }
 
   // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
