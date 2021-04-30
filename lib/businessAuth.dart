@@ -7,9 +7,10 @@ import 'package:pointycastle/api.dart' as crypto;
 import 'package:pointycastle/export.dart' as cryptoExport;
 import 'package:pointycastle/asymmetric/api.dart';
 import "package:dart_amqp/dart_amqp.dart";
-import 'package:qr_example/qrShow.dart';
 import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:json_store/json_store.dart';
+
+import 'package:qr_example/qrShow.dart';
 
 class BusinessAuthView extends StatefulWidget {
   @override

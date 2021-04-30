@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
@@ -23,8 +24,14 @@ class _NurseScanView extends State<NurseScanView> {
   // called immediately or I'm doing something really dumb without realizing
   @override
   void initState() {
-    loaded = true;
+    Timer(Duration(milliseconds: 100), handleTimer);
     super.initState();
+  }
+
+  void handleTimer() {
+    setState(() {
+      loaded = true;
+    });
   }
 
   @override

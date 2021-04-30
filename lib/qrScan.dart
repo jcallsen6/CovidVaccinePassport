@@ -51,8 +51,10 @@ class _QRScanWidget extends State<QRScanWidget> {
                     ElevatedButton(
                       child: Text('Reset Camera'),
                       onPressed: () {
-                        controller.pauseCamera();
-                        controller.resumeCamera();
+                        // silly solution but pausing and resuming would
+                        // just freeze on iOS
+                        controller.flipCamera();
+                        controller.flipCamera();
                       },
                     ),
                   ]))),
