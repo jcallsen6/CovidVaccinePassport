@@ -54,10 +54,18 @@ class _BusinessAuthView extends State<BusinessAuthView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: _buildAppBar(context),
         body: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[QRShowWidget(id)],
-    ));
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[QRShowWidget(id)],
+        ));
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text('Business QR Code for User'),
+      centerTitle: true,
+    );
   }
 
   // source: https://github.com/PointyCastle/pointycastle/blob/master/tutorials/rsa.md

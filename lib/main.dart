@@ -65,7 +65,7 @@ class _MenuView extends State<MenuView> {
           ),
         ]),
         Icon(Icons.medical_services_outlined,
-            size: MediaQuery.of(context).size.height / 3),
+            size: MediaQuery.of(context).size.height / 3.25),
         Container(
           alignment: Alignment.center,
           child: ElevatedButton(

@@ -28,7 +28,7 @@ class _BusinessScanView extends State<BusinessScanView> {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      title: const Text('Business'),
+      title: const Text('Business Scanner'),
       centerTitle: true,
       leading: IconButton(
         icon: const Icon(Icons.home),

@@ -30,7 +30,10 @@ class _NurseScanView extends State<NurseScanView> {
   @override
   Widget build(BuildContext context) {
     if (loaded) {
-      return QRScanWidget(_onScan);
+      return Scaffold(
+        appBar: _buildAppBar(context),
+        body: QRScanWidget(_onScan),
+      );
     } else {
       return Scaffold(
           body: Column(
@@ -38,6 +41,13 @@ class _NurseScanView extends State<NurseScanView> {
         children: <Widget>[SpinKitRing(color: Colors.blue)],
       ));
     }
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text('Nurse Scanner'),
+      centerTitle: true,
+    );
   }
 
   void _onScan(Barcode result) async {
