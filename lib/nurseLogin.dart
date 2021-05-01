@@ -57,7 +57,7 @@ class _NurseLoginView extends State<NurseLoginView> {
                             utf8.encode('${_username.text}:${_password.text}'));
                     var client = http.Client();
                     var req = await client.get(
-                      Uri.parse('http://192.168.1.155:8080/Authenticate'),
+                      Uri.parse('http://192.168.1.155:8085/Authenticate'),
                       headers: <String, String>{'authorization': basicAuth},
                     );
                     if (req.statusCode == 200) {

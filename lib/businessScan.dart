@@ -43,7 +43,7 @@ class _BusinessScanView extends State<BusinessScanView> {
   void _onScan(Barcode result) async {
     var client = http.Client();
     var req = await client.get(
-      Uri.parse('http://192.168.1.155:8080/CheckUser?user=${result.code}'),
+      Uri.parse('http://192.168.1.155:8085/CheckUser?user=${result.code}'),
     );
     if (req.body == 'success') {
       Navigator.push(

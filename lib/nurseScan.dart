@@ -62,7 +62,7 @@ class _NurseScanView extends State<NurseScanView> {
     String basicAuth = 'Basic ' +
         base64Encode(utf8.encode('${widget.username}:${widget.password}'));
     var client = http.Client();
-    var req = await client.post(Uri.parse('http://192.168.1.155:8080/AddUser'),
+    var req = await client.post(Uri.parse('http://192.168.1.155:8085/AddUser'),
         headers: <String, String>{'authorization': basicAuth},
         body: {'user': result.code});
     if (req.statusCode == 200) {
