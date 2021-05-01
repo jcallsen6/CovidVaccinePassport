@@ -42,14 +42,49 @@ class _BusinessScanView extends State<BusinessScanView> {
 
   void _onScan(Barcode result) async {
     var client = http.Client();
+    // manually encode + signs as dart does not do this even in Uri.encodeFull()
     var req = await client.get(
-      Uri.parse('http://192.168.1.155:8085/CheckUser?user=${result.code}'),
+      Uri.parse('http://192.168.1.155:8085/CheckUser?user=${result.code}'
+          .replaceAll('+', '%2B')),
     );
     if (req.body == 'success') {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => BusinessAuthView(result.code)),
       );
+    } else {
+      _invalidUser();
     }
+  }
+
+  // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
+  Future<void> _invalidUser() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('User Not Found'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Icon(
+                  Icons.no_encryption,
+                  size: 64,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Retry'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

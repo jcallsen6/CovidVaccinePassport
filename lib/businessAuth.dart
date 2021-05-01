@@ -103,7 +103,8 @@ class _BusinessAuthView extends State<BusinessAuthView> {
   // source: https://pub.dev/packages/dart_amqp
   Future<void> _consume(String queue) async {
     Channel channel = await rabbitClient.channel();
-    Exchange exchange = await channel.exchange('Business', ExchangeType.DIRECT);
+    Exchange exchange =
+        await channel.exchange('Businesses', ExchangeType.DIRECT);
 
     Consumer consumer = await exchange.bindQueueConsumer(queue, [queue]);
     consumer.listen((AmqpMessage message) async {
@@ -111,10 +112,43 @@ class _BusinessAuthView extends State<BusinessAuthView> {
           _verifySignature(message.payloadAsString, widget.publicKey);
       if (result != null) {
         await _showSuccessDialog(result);
-        rabbitClient.close();
-        Navigator.pop(context);
+      } else {
+        await _invalidUser();
       }
+      rabbitClient.close();
+      Navigator.pop(context);
     });
+  }
+
+  // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
+  Future<void> _invalidUser() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('User Not Found'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Icon(
+                  Icons.no_encryption,
+                  size: 64,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Retry'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
