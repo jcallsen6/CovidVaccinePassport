@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_httpauth import HTTPBasicAuth
 import pymongo
 
@@ -38,11 +38,11 @@ def verify_password(username, password):
 
 @app.route('/AddUser', methods = ['POST'])
 @auth.login_required
-def add_user(user):
+def add_user():
+    user = request.form['user']
     data = {"key": user}
     cursorUser.insert_one(data)
     return "success"
-
 
 
 
@@ -54,7 +54,8 @@ def authenticate():
 
 
 @app.route('/Checkuser', methods = ['GET']) #anyone can use without username / pw
-def check_user(user):
+def check_user():
+    user = request.form['user']
     for item in cursorUser.find():    #list of every user
         if item['key'] == user:
             return "success"
@@ -65,9 +66,12 @@ def check_user(user):
 
 @app.route('/AddNurse', methods = ['POST'])
 @auth.login_required
-def add_nurse(new_nurse, new_pass):
+def add_nurse():
+    new_nurse = request.form['new_nurse']
+    new_pass = request.form['new_pass']
     data = {"username": new_nurse, "password": new_pass}
     cursorNurse.insert_one(data)
+    return "success"
 
 
         
