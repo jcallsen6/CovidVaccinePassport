@@ -75,7 +75,8 @@ class _NurseScanView extends State<NurseScanView> {
           _successDialog();
         }
       } on SocketException {
-        _serverDownDialog();
+        await _serverDownDialog();
+        Navigator.pop(context);
       }
     }
   }
