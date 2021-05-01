@@ -4,6 +4,7 @@ import 'dart:core';
 import 'package:flutter/material.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:qr_example/qrScan.dart';
@@ -44,9 +45,9 @@ class _BusinessScanView extends State<BusinessScanView> {
   }
 
   void _onScan(Barcode result) async {
-    // source for regex for public keys: https://stackoverflow.com/a/35801497
-    if (RegExp('\/-----BEGIN PUBLIC KEY-----(.*)-----END PUBLIC KEY-----\/s')
-        .hasMatch(result.code)) {
+    try {
+      // make sure the qr code scanned is a valid public key
+      RsaKeyHelper().parsePublicKeyFromPem(result.code);
       var client = http.Client();
       try {
         // manually encode + signs as dart does not do this even in Uri.encodeFull()
@@ -66,6 +67,8 @@ class _BusinessScanView extends State<BusinessScanView> {
       } on SocketException {
         _serverDownDialog();
       }
+    } catch (exception) {
+      print('Invalid QR Code Scanned');
     }
   }
 

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:rsa_encrypt/rsa_encrypt.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -59,9 +60,9 @@ class _NurseScanView extends State<NurseScanView> {
   }
 
   void _onScan(Barcode result) async {
-    // source for regex for public keys: https://stackoverflow.com/a/35801497
-    if (RegExp('\/-----BEGIN PUBLIC KEY-----(.*)-----END PUBLIC KEY-----\/s')
-        .hasMatch(result.code)) {
+    try {
+      // make sure the qr code scanned is a valid public key
+      RsaKeyHelper().parsePublicKeyFromPem(result.code);
       // source for basic auth: https://stackoverflow.com/questions/50244416/how-to-pass-basic-auth-credentials-in-api-call-for-a-flutter-mobile-application
       String basicAuth = 'Basic ' +
           base64Encode(utf8.encode('${widget.username}:${widget.password}'));
@@ -78,6 +79,8 @@ class _NurseScanView extends State<NurseScanView> {
         await _serverDownDialog();
         Navigator.pop(context);
       }
+    } catch (exception) {
+      print('Invalid QR Code Scanned');
     }
   }
 

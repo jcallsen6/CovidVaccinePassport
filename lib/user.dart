@@ -139,9 +139,8 @@ class _UserView extends State<UserView> {
   }
 
   Future<void> _onScan(Barcode result) async {
-    if (RegExp(
-            '[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvqxyz0123456789]{64}')
-        .hasMatch(result.code)) {
+    // make sure scanning a qr code that contains a uuid
+    if (RegExp('[a-zA-Z\d]{64}').hasMatch(result.code)) {
       Random rng = new Random();
       String message = '';
       for (var i = 0; i < 5; i++) {
