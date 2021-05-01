@@ -139,16 +139,20 @@ class _UserView extends State<UserView> {
   }
 
   Future<void> _onScan(Barcode result) async {
-    Random rng = new Random();
-    String message = '';
-    for (var i = 0; i < 5; i++) {
-      message += rng.nextInt(10).toString();
-    }
-    String signature =
-        RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
+    if (RegExp(
+            '[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvqxyz0123456789]{64}')
+        .hasMatch(result.code)) {
+      Random rng = new Random();
+      String message = '';
+      for (var i = 0; i < 5; i++) {
+        message += rng.nextInt(10).toString();
+      }
+      String signature =
+          RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
 
-    if (await _publish('Businesses', result.code, "$message:$signature")) {
-      await _showPublishDialog(message);
+      if (await _publish('Businesses', result.code, "$message:$signature")) {
+        await _showPublishDialog(message);
+      }
     }
   }
 

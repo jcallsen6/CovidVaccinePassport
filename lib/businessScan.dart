@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:core';
 
 import 'package:flutter/material.dart';
 
@@ -43,24 +44,28 @@ class _BusinessScanView extends State<BusinessScanView> {
   }
 
   void _onScan(Barcode result) async {
-    var client = http.Client();
-    try {
-      // manually encode + signs as dart does not do this even in Uri.encodeFull()
-      var req = await client.get(
-        Uri.parse('http://192.168.1.155:8085/CheckUser?user=${result.code}'
-            .replaceAll('+', '%2B')),
-      );
-      if (req.body == 'success') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => BusinessAuthView(result.code)),
+    // source for regex for public keys: https://stackoverflow.com/a/35801497
+    if (RegExp('\/-----BEGIN PUBLIC KEY-----(.*)-----END PUBLIC KEY-----\/s')
+        .hasMatch(result.code)) {
+      var client = http.Client();
+      try {
+        // manually encode + signs as dart does not do this even in Uri.encodeFull()
+        var req = await client.get(
+          Uri.parse('http://192.168.1.155:8085/CheckUser?user=${result.code}'
+              .replaceAll('+', '%2B')),
         );
-      } else {
-        _invalidUser();
+        if (req.body == 'success') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BusinessAuthView(result.code)),
+          );
+        } else {
+          _invalidUser();
+        }
+      } on SocketException {
+        _serverDownDialog();
       }
-    } on SocketException {
-      _serverDownDialog();
     }
   }
 

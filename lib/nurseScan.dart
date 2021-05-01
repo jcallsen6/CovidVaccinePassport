@@ -59,20 +59,24 @@ class _NurseScanView extends State<NurseScanView> {
   }
 
   void _onScan(Barcode result) async {
-    // source for basic auth: https://stackoverflow.com/questions/50244416/how-to-pass-basic-auth-credentials-in-api-call-for-a-flutter-mobile-application
-    String basicAuth = 'Basic ' +
-        base64Encode(utf8.encode('${widget.username}:${widget.password}'));
-    var client = http.Client();
-    try {
-      var req = await client.post(
-          Uri.parse('http://192.168.1.155:8085/AddUser'),
-          headers: <String, String>{'authorization': basicAuth},
-          body: {'user': result.code});
-      if (req.statusCode == 200) {
-        _successDialog();
+    // source for regex for public keys: https://stackoverflow.com/a/35801497
+    if (RegExp('\/-----BEGIN PUBLIC KEY-----(.*)-----END PUBLIC KEY-----\/s')
+        .hasMatch(result.code)) {
+      // source for basic auth: https://stackoverflow.com/questions/50244416/how-to-pass-basic-auth-credentials-in-api-call-for-a-flutter-mobile-application
+      String basicAuth = 'Basic ' +
+          base64Encode(utf8.encode('${widget.username}:${widget.password}'));
+      var client = http.Client();
+      try {
+        var req = await client.post(
+            Uri.parse('http://192.168.1.155:8085/AddUser'),
+            headers: <String, String>{'authorization': basicAuth},
+            body: {'user': result.code});
+        if (req.statusCode == 200) {
+          _successDialog();
+        }
+      } on SocketException {
+        _serverDownDialog();
       }
-    } on SocketException {
-      _serverDownDialog();
     }
   }
 
