@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -62,12 +63,38 @@ class _NurseScanView extends State<NurseScanView> {
     String basicAuth = 'Basic ' +
         base64Encode(utf8.encode('${widget.username}:${widget.password}'));
     var client = http.Client();
-    var req = await client.post(Uri.parse('http://192.168.1.155:8085/AddUser'),
-        headers: <String, String>{'authorization': basicAuth},
-        body: {'user': result.code});
-    if (req.statusCode == 200) {
-      _successDialog();
+    try {
+      var req = await client.post(
+          Uri.parse('http://192.168.1.155:8085/AddUser'),
+          headers: <String, String>{'authorization': basicAuth},
+          body: {'user': result.code});
+      if (req.statusCode == 200) {
+        _successDialog();
+      }
+    } on SocketException {
+      _serverDownDialog();
     }
+  }
+
+  // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
+  Future<void> _serverDownDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Authentication Server is Down'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Retry'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html

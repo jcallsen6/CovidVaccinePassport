@@ -102,22 +102,48 @@ class _BusinessAuthView extends State<BusinessAuthView> {
 
   // source: https://pub.dev/packages/dart_amqp
   Future<void> _consume(String queue) async {
-    Channel channel = await rabbitClient.channel();
-    Exchange exchange =
-        await channel.exchange('Businesses', ExchangeType.DIRECT);
+    try {
+      Channel channel = await rabbitClient.channel();
+      Exchange exchange =
+          await channel.exchange('Businesses', ExchangeType.DIRECT);
 
-    Consumer consumer = await exchange.bindQueueConsumer(queue, [queue]);
-    consumer.listen((AmqpMessage message) async {
-      String result =
-          _verifySignature(message.payloadAsString, widget.publicKey);
-      if (result != null) {
-        await _showSuccessDialog(result);
-      } else {
-        await _invalidUser();
-      }
-      rabbitClient.close();
+      Consumer consumer = await exchange.bindQueueConsumer(queue, [queue]);
+      consumer.listen((AmqpMessage message) async {
+        String result =
+            _verifySignature(message.payloadAsString, widget.publicKey);
+        if (result != null) {
+          await _showSuccessDialog(result);
+        } else {
+          await _invalidUser();
+        }
+        rabbitClient.close();
+        Navigator.pop(context);
+      });
+    } on ConnectionFailedException {
+      await _serverDownDialog();
       Navigator.pop(context);
-    });
+    }
+  }
+
+  // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
+  Future<void> _serverDownDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Messaging Server is Down'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Retry'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html

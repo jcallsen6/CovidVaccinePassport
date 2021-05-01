@@ -57,15 +57,40 @@ class _UserView extends State<UserView> {
   }
 
 // source: https://pub.dev/packages/dart_amqp
-  Future<void> _publish(String exchange, String queue, String message) async {
-    rabbitClient
-        .channel()
-        .then((Channel channel) =>
-            channel.exchange(exchange, ExchangeType.DIRECT))
-        .then((Exchange exchange) {
-      exchange.publish(message, queue);
-      return rabbitClient.close();
-    });
+  Future<bool> _publish(
+      String exchangeName, String queueName, String message) async {
+    try {
+      Channel channel = await rabbitClient.channel();
+      Exchange exchange =
+          await channel.exchange(exchangeName, ExchangeType.DIRECT);
+      exchange.publish(message, queueName);
+      rabbitClient.close();
+    } on ConnectionFailedException {
+      await _serverDownDialog();
+      return false;
+    }
+    return true;
+  }
+
+  // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
+  Future<void> _serverDownDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Messaging Server is Down'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Retry'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -122,8 +147,9 @@ class _UserView extends State<UserView> {
     String signature =
         RsaKeyHelper().sign(message, keyPair.privateKey as RSAPrivateKey);
 
-    await _publish('Businesses', result.code, "$message:$signature");
-    await _showPublishDialog(message);
+    if (await _publish('Businesses', result.code, "$message:$signature")) {
+      await _showPublishDialog(message);
+    }
   }
 
   // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html

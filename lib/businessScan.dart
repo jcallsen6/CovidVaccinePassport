@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -42,19 +44,45 @@ class _BusinessScanView extends State<BusinessScanView> {
 
   void _onScan(Barcode result) async {
     var client = http.Client();
-    // manually encode + signs as dart does not do this even in Uri.encodeFull()
-    var req = await client.get(
-      Uri.parse('http://192.168.1.155:8085/CheckUser?user=${result.code}'
-          .replaceAll('+', '%2B')),
-    );
-    if (req.body == 'success') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => BusinessAuthView(result.code)),
+    try {
+      // manually encode + signs as dart does not do this even in Uri.encodeFull()
+      var req = await client.get(
+        Uri.parse('http://192.168.1.155:8085/CheckUser?user=${result.code}'
+            .replaceAll('+', '%2B')),
       );
-    } else {
-      _invalidUser();
+      if (req.body == 'success') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => BusinessAuthView(result.code)),
+        );
+      } else {
+        _invalidUser();
+      }
+    } on SocketException {
+      _serverDownDialog();
     }
+  }
+
+  // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
+  Future<void> _serverDownDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Authentication Server is Down'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Retry'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html

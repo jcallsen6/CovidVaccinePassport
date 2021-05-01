@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 
@@ -56,21 +58,25 @@ class _NurseLoginView extends State<NurseLoginView> {
                         base64Encode(
                             utf8.encode('${_username.text}:${_password.text}'));
                     var client = http.Client();
-                    var req = await client.get(
-                      Uri.parse('http://192.168.1.155:8085/Authenticate'),
-                      headers: <String, String>{'authorization': basicAuth},
-                    );
-                    if (req.statusCode == 200) {
-                      client.close();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                NurseScanView(_username.text, _password.text)),
+                    try {
+                      var req = await client.get(
+                        Uri.parse('http://192.168.1.155:8085/Authenticate'),
+                        headers: <String, String>{'authorization': basicAuth},
                       );
-                    } else {
-                      client.close();
-                      _invalidLogin();
+                      if (req.statusCode == 200) {
+                        client.close();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NurseScanView(
+                                  _username.text, _password.text)),
+                        );
+                      } else {
+                        client.close();
+                        _invalidLogin();
+                      }
+                    } on SocketException {
+                      _serverDownDialog();
                     }
                   },
                   child: Text(
@@ -95,6 +101,27 @@ class _NurseLoginView extends State<NurseLoginView> {
           Navigator.pop(context);
         },
       ),
+    );
+  }
+
+  // source: https://api.flutter.dev/flutter/material/AlertDialog-class.html
+  Future<void> _serverDownDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Authentication Server is Down'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Retry'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
