@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:core';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,21 @@ class _BusinessScanView extends State<BusinessScanView> {
   Barcode result;
   QRViewController controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  bool loaded = false;
+
+  // Super dumb solution due to broken qr code scanner library. Camera crashes if
+  // called immediately or I'm doing something really dumb without realizing
+  @override
+  void initState() {
+    Timer(Duration(milliseconds: 100), handleTimer);
+    super.initState();
+  }
+
+  void handleTimer() {
+    setState(() {
+      loaded = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,11 +72,14 @@ class _BusinessScanView extends State<BusinessScanView> {
               .replaceAll('+', '%2B')),
         );
         if (req.body == 'success') {
-          Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => BusinessAuthView(result.code)),
           );
+          // stupid delay to get the camera to come up
+          loaded = false;
+          Timer(Duration(milliseconds: 100), handleTimer);
         } else {
           _invalidUser();
         }
