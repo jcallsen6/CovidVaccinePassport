@@ -6,3 +6,7 @@ A Flutter project for iOS and Android to keep track of users's vaccination statu
 ## Getting Started
 
 https://flutter.dev/docs/get-started/install
+
+## Usage
+
+Replace IP addresses for RabbitMQ and API servers and update RabbitMQ username and password.
